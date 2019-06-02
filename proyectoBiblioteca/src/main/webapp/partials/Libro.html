@@ -1,9 +1,8 @@
-		
 <div class="panel panel-primary" ng-hide="panelEditar">
     <div class="panel-heading">Parametrizaci&oacute;n de Libro</div>
     <div class="panel-body">
         <div class="btn-group">
-            <button type="button" class="btn btn-default" ng-click="nuevo()">Nuevo Cliente</button>
+            <button type="button" class="btn btn-default" ng-click="nuevo()">Nuevo Libro</button>
         </div>
         <table class="resultados table table-striped">
             <tr>
@@ -24,7 +23,7 @@
                     Autor
                 </th>
                 <th>
-                    <input class="form-control" ng-model="q"  placeholder="Buscar"/>
+                    <input class="form-control" ng-model="q" placeholder="Buscar" />
                 </th>
             </tr>
             <tr dir-paginate="row in lista|filter: q|itemsPerPage:10">
@@ -33,8 +32,8 @@
                 <td>{{row.descripcion}}</td>
 
                 <td>{{row.cantidad}}</td>
-     <td>{{row.edicion}}</td>
-                <td class="row">{{row.autor.nombre}}</td>     
+                <td>{{row.edicion}}</td>
+                <td class="row">{{row.autor.name}}</td>
 
                 <td class="row">
                     <button type="button" class="btn btn-default" ng-click="editar(row)">
@@ -57,54 +56,36 @@
 
         <div class="form-group col-md-6" ng-class="errores.titulo ? 'error' : ''">
             <label for="nombre">titulo</label>
-            <input id="titulo" 
-                   class="form-control" 
-                   type="text"
-                   ng-model="datosFormulario.titulo"
-                   placeholder="titulo"/>
+            <input id="titulo" class="form-control" type="text" ng-model="datosFormulario.titulo" placeholder="titulo" />
             <div ng-show="errores.titulo">{{errores.titulo}}</div>
-        </div>				
+        </div>
         <div class="form-group col-md-6" ng-class="errores.descripcion ? 'error' : ''">
             <label for="direccion">descripcion</label>
-            <input id="descripcion" 
-                   class="form-control" 
-                   type="text"
-                   ng-model="datosFormulario.descripcion"
-                   placeholder="descripcion"/>
+            <input id="descripcion" class="form-control" type="text" ng-model="datosFormulario.descripcion" placeholder="descripcion" />
             <div ng-show="errores.descripcion">{{errores.descripcion}}</div>
-        </div>				
+        </div>
         <div class="form-group col-md-6" ng-class="errores.cantidad ? 'error' : ''">
             <label for="telefono">cantidad</label>
-            <input id="cantidad" 
-                   class="form-control" 
-                   type="text"
-                   ng-model="datosFormulario.cantidad"
-                   placeholder="cantidad"/>
+            <input id="cantidad" class="form-control" type="text" ng-model="datosFormulario.cantidad" placeholder="cantidad" />
             <div ng-show="errores.cantidad">{{errores.cantidad}}</div>
-        </div> 
-         <div class="form-group col-md-6" ng-class="errores.edicion ? 'error' : ''">
+        </div>
+        <div class="form-group col-md-6" ng-class="errores.edicion ? 'error' : ''">
             <label for="telefono">edicion</label>
-            <input id="cantidad" 
-                   class="form-control" 
-                   type="text"
-                   ng-model="datosFormulario.edicion"
-                   placeholder="edicion"/>
+            <input id="cantidad" class="form-control" type="text" ng-model="datosFormulario.edicion" placeholder="edicion" />
             <div ng-show="errores.edicion">{{errores.edicion}}</div>
-        </div> 
+        </div>
         <div class="row">
             <div class="form-group col-md-6" ng-class="errores.autor ? 'error' : ''">
                 <label>autor</label>
-                <select id="autor" class="form-control" 
-                        ng-model="datosFormulario.autor"
-                        ng-options="option.nombre for option in listaautor track by option.id">
+                <select id="autor" class="form-control" ng-model="datosFormulario.autor" ng-options="option.name for option in listaAutor track by option.id">
                 </select>
                 <div ng-show="errores.autor">{{errores.autor}}</div>
             </div>
         </div>
 
         <div class="btn-group">
-            <button type="button" class="btn btn-default" ng-click="guardar()">Aceptar</button>
+            <button type="button" class="btn btn-default" ng-click="createOrsave()">Aceptar</button>
             <button type="button" class="btn btn-default" ng-click="cancelar()">Cancelar</button>
-        </div>    
+        </div>
     </div>
 </div>

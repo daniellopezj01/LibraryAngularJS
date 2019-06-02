@@ -1,57 +1,105 @@
 'use strict';
-
-var listaPrestamo = [{
-        "fecha": "17/03/2019",
-        "observacion": "el libro es de clase alta",
-        "estado": "bueno",
-        "dias": 4,
-        "multa": 3000,
-        "libro": { "id": 1, "titulo": "el amor en los tiempos del colera", "descripcion": "amor conflicto y mucho tiempo", "cantidad": 2, "edicion": 3406, },
-        "cliente": { "id": 1, "nombre": "Deisy", "direccion": "car 8a # 45 - 121", "telefono": "3114456556" }
-    },
-    {
-        "fecha": "17/04/2018",
-        "observacion": "el libro es de clase media",
-        "estado": "regular",
-        "dias": 10,
-        "multa": 1000,
-        "libro": { "id": 2, "titulo": "retirate joven y rico", "descripcion": "manejo de finanzas", "cantidad": 4, "edicion": 2417 },
-        "cliente": { "id": 1, "nombre": "Pedro", "direccion": "car 46 # 163b - 41", "telefono": "3207594755" }
-    },
-];
-var consecutivoCliente = 2;
-
 module.controller('PrestamoCtrl', ['$scope', '$filter', '$http', function($scope, $filter, $http) {
     //listar
-    $scope.lista = listaPrestamo;
-    $scope.listalibros = listalibros;
-    $scope.listaCliente = listaCliente;
+    $scope.lista;
+    $scope.listaLibro;
+    $scope.listaCliente;
+    $scope.falg = false;
+
     $scope.datosFormulario = {};
     $scope.panelEditar = false;
+
     $scope.listar = function() {
-        $scope.lista = listaPrestamo;
-    };
+        $http.get('http://localhost:8080/library/webresources/Prestamo').
+        then(function(response) {
+            $scope.lista = response.data;
+        });
+    }
+
+    $scope.listarlibro = function() {
+        $http.get('http://localhost:8080/library/webresources/libro').
+        then(function(response) {
+            $scope.listaLibro = response.data;
+        });
+    }
+
+    $scope.listarClientes = function() {
+        $http.get('http://localhost:8080/library/webresources/Cliente').
+        then(function(response) {
+            $scope.listaCliente = response.data;
+        });
+    }
 
     $scope.listar();
+    $scope.listarlibro();
+    $scope.listarClientes();
+
     //guardar
     $scope.nuevo = function() {
         $scope.panelEditar = true;
         $scope.datosFormulario = {};
+        $scope.falg = false;
     };
+
+
+    $scope.createOrsave = function() {
+        if ($scope.falg == true) {
+            $scope.update();
+        } else {
+            $scope.guardar();
+        }
+    }
 
     $scope.guardar = function() {
         $scope.errores = {};
         var error = false;
-
         if (error)
             return;
         if (!$scope.datosFormulario.id) {
-            $scope.datosFormulario.id = consecutivoCliente++;
+            $scope.datosFormulario.id = $scope.lista[$scope.lista.length - 1].id + 1;
         }
-        $scope.lista.push($scope.datosFormulario);
+        var config = {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }
+        console.log($scope.datosFormulario);
+        $http.post("http://localhost:8080/library/webresources/Prestamo", $scope.datosFormulario, config)
+            .success(function(data, status, headers, config) {
+                $scope.PostDataResponse = data;
+                $scope.listar();
+            })
+            .error(function(data, status, header, config) {
+                $scope.ResponseDetails = "Data: " + data +
+                    "<hr />status: " + status +
+                    "<hr />headers: " + header +
+                    "<hr />config: " + config;
+            });
         alert("Sus datos han sido guardados con éxito");
         $scope.cancelar();
     };
+
+    $scope.update = function() {
+        var config = {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }
+        console.log($scope.datosFormulario);
+        $http.put("http://localhost:8080/library/webresources/Prestamo", $scope.datosFormulario, config)
+            .success(function(data, status, headers, config) {
+                $scope.PostDataResponse = data;
+                $scope.listar();
+            })
+            .error(function(data, status, header, config) {
+                $scope.ResponseDetails = "Data: " + data +
+                    "<hr />status: " + status +
+                    "<hr />headers: " + header +
+                    "<hr />config: " + config;
+            });
+        alert("datos actualizados correctamente");
+        $scope.cancelar();
+    }
 
     $scope.cancelar = function() {
         $scope.panelEditar = false;
@@ -62,13 +110,22 @@ module.controller('PrestamoCtrl', ['$scope', '$filter', '$http', function($scope
     $scope.editar = function(data) {
         $scope.panelEditar = true;
         $scope.datosFormulario = data;
+        $scope.falg = true;
     };
+
     //eliminar
     $scope.eliminar = function(data) {
         if (confirm('\xbfDesea elminar este registro?')) {
             for (var i = 0; i < $scope.lista.length; i++) {
                 if ($scope.lista[i].id == data.id) {
-                    $scope.lista.splice(i, 1);
+                    $http.delete('http://localhost:8080/library/webresources/Prestamo/' + $scope.lista[i].id).
+                    then(function(response) {
+                        if (response.data == "OK") {
+                            $scope.listar();
+                        } else {
+                            alert("Error en eliminar datos");
+                        }
+                    });
                 }
             }
         }

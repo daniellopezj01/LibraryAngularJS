@@ -1,37 +1,88 @@
 'use strict';
 
-var listautor = [{ "id": 1, "nombre": "garcia marquez", "nacionalidad": "colombiana" }, { "id": 2, "nombre": "rober kiyosaky", "nacionalidad": "Estados unidos" }];
-var consecutivoCiudad = 2;
-
 module.controller('AutorCtrl', ['$scope', '$filter', '$http', function($scope, $filter, $http) {
-    //listar
-    $scope.lista = listautor;
+    $scope.lista;
+    $scope.falg = false;
+
     $scope.datosFormulario = {};
     $scope.panelEditar = false;
+
     $scope.listar = function() {
-        $scope.lista = listautor;
-    };
+        $http.get('http://localhost:8080/library/webresources/Autor').
+        then(function(response) {
+            // $scope.lista = JSON.stringify(response.data);
+            $scope.lista = response.data;
+        });
+    }
 
     $scope.listar();
+
     //guardar
     $scope.nuevo = function() {
         $scope.panelEditar = true;
         $scope.datosFormulario = {};
+        $scope.falg = false;
     };
+
+
+    $scope.createOrsave = function() {
+        if ($scope.falg == true) {
+            $scope.update();
+        } else {
+            $scope.guardar();
+        }
+    }
 
     $scope.guardar = function() {
         $scope.errores = {};
         var error = false;
-
         if (error)
             return;
         if (!$scope.datosFormulario.id) {
-            $scope.datosFormulario.id = consecutivoCiudad++;
+            $scope.datosFormulario.id = $scope.lista[$scope.lista.length - 1].id + 1;
         }
-        $scope.lista.push($scope.datosFormulario);
+        var config = {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }
+        console.log($scope.datosFormulario);
+        $http.post("http://localhost:8080/library/webresources/Autor", $scope.datosFormulario, config)
+            .success(function(data, status, headers, config) {
+                $scope.PostDataResponse = data;
+                $scope.listar();
+            })
+            .error(function(data, status, header, config) {
+                $scope.ResponseDetails = "Data: " + data +
+                    "<hr />status: " + status +
+                    "<hr />headers: " + header +
+                    "<hr />config: " + config;
+            });
         alert("Sus datos han sido guardados con éxito");
         $scope.cancelar();
     };
+
+    $scope.update = function() {
+        var config = {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }
+        console.log($scope.datosFormulario);
+        $http.put("http://localhost:8080/library/webresources/Autor", $scope.datosFormulario, config)
+            .success(function(data, status, headers, config) {
+                $scope.PostDataResponse = data;
+                $scope.listar();
+            })
+            .error(function(data, status, header, config) {
+                $scope.ResponseDetails = "Data: " + data +
+                    "<hr />status: " + status +
+                    "<hr />headers: " + header +
+                    "<hr />config: " + config;
+            });
+        alert("datos actualizados correctamente");
+        $scope.cancelar();
+    }
 
     $scope.cancelar = function() {
         $scope.panelEditar = false;
@@ -42,13 +93,22 @@ module.controller('AutorCtrl', ['$scope', '$filter', '$http', function($scope, $
     $scope.editar = function(data) {
         $scope.panelEditar = true;
         $scope.datosFormulario = data;
+        $scope.falg = true;
     };
+
     //eliminar
     $scope.eliminar = function(data) {
         if (confirm('\xbfDesea elminar este registro?')) {
             for (var i = 0; i < $scope.lista.length; i++) {
                 if ($scope.lista[i].id == data.id) {
-                    $scope.lista.splice(i, 1);
+                    $http.delete('http://localhost:8080/library/webresources/Autor/' + $scope.lista[i].id).
+                    then(function(response) {
+                        if (response.data == "OK") {
+                            $scope.listar();
+                        } else {
+                            alert("Error en eliminar datos");
+                        }
+                    });
                 }
             }
         }

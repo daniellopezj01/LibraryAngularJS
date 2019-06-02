@@ -1,41 +1,99 @@
 'use strict';
 
-var listalibros = [
-    { "id": 1, "titulo": "el amor en los tiempos del colera", "descripcion": "amor conflicto y mucho tiempo", "cantidad": 2, "edicion": 3406, "autor": { "id": 1, "nombre": "garcia marquez", "nacionalidad": "colombiana" } },
-    { "id": 2, "titulo": "retirate joven y rico", "descripcion": "manejo de finanzas", "cantidad": 4, "edicion": 2417, "autor": { "id": 2, "nombre": "rober kiyosaky", "nacionalidad": "Estados unidos" } },
-];
 var consecutivoCliente = 2;
 
 module.controller('LibroCtrl', ['$scope', '$filter', '$http', function($scope, $filter, $http) {
-    //listar
-    $scope.lista = listalibros;
-    $scope.listaautor = listautor;
+    $scope.lista;
+    $scope.listaAutor;
+    $scope.falg = false;
+
     $scope.datosFormulario = {};
     $scope.panelEditar = false;
+
     $scope.listar = function() {
-        $scope.lista = listalibros;
-    };
+        $http.get('http://localhost:8080/library/webresources/libro').
+        then(function(response) {
+            $scope.lista = response.data;
+        });
+    }
+
+    $scope.listarCiudad = function() {
+        $http.get('http://localhost:8080/library/webresources/Autor').
+        then(function(response) {
+            // $scope.lista = JSON.stringify(response.data);
+            $scope.listaAutor = response.data;
+        });
+    }
 
     $scope.listar();
+    $scope.listarCiudad();
+
     //guardar
     $scope.nuevo = function() {
         $scope.panelEditar = true;
         $scope.datosFormulario = {};
+        $scope.falg = false;
     };
+
+
+    $scope.createOrsave = function() {
+        if ($scope.falg == true) {
+            $scope.update();
+        } else {
+            $scope.guardar();
+        }
+    }
 
     $scope.guardar = function() {
         $scope.errores = {};
         var error = false;
-
         if (error)
             return;
         if (!$scope.datosFormulario.id) {
-            $scope.datosFormulario.id = consecutivoCliente++;
+            $scope.datosFormulario.id = $scope.lista[$scope.lista.length - 1].id + 1;
         }
-        $scope.lista.push($scope.datosFormulario);
+        var config = {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }
+        console.log($scope.datosFormulario);
+        $http.post("http://localhost:8080/library/webresources/libro", $scope.datosFormulario, config)
+            .success(function(data, status, headers, config) {
+                $scope.PostDataResponse = data;
+                $scope.listar();
+            })
+            .error(function(data, status, header, config) {
+                $scope.ResponseDetails = "Data: " + data +
+                    "<hr />status: " + status +
+                    "<hr />headers: " + header +
+                    "<hr />config: " + config;
+            });
         alert("Sus datos han sido guardados con éxito");
         $scope.cancelar();
     };
+
+    $scope.update = function() {
+        var config = {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }
+        console.log($scope.datosFormulario);
+        $http.put("http://localhost:8080/library/webresources/libro", $scope.datosFormulario, config)
+            .success(function(data, status, headers, config) {
+                $scope.PostDataResponse = data;
+                $scope.listar();
+            })
+            .error(function(data, status, header, config) {
+                $scope.ResponseDetails = "Data: " + data +
+                    "<hr />status: " + status +
+                    "<hr />headers: " + header +
+                    "<hr />config: " + config;
+            });
+        alert("datos actualizados correctamente");
+        $scope.cancelar();
+    }
 
     $scope.cancelar = function() {
         $scope.panelEditar = false;
@@ -46,13 +104,22 @@ module.controller('LibroCtrl', ['$scope', '$filter', '$http', function($scope, $
     $scope.editar = function(data) {
         $scope.panelEditar = true;
         $scope.datosFormulario = data;
+        $scope.falg = true;
     };
+
     //eliminar
     $scope.eliminar = function(data) {
         if (confirm('\xbfDesea elminar este registro?')) {
             for (var i = 0; i < $scope.lista.length; i++) {
                 if ($scope.lista[i].id == data.id) {
-                    $scope.lista.splice(i, 1);
+                    $http.delete('http://localhost:8080/library/webresources/libro/' + $scope.lista[i].id).
+                    then(function(response) {
+                        if (response.data == "OK") {
+                            $scope.listar();
+                        } else {
+                            alert("Error en eliminar datos");
+                        }
+                    });
                 }
             }
         }

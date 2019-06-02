@@ -1,4 +1,3 @@
-		
 <div class="panel panel-primary" ng-hide="panelEditar">
     <div class="panel-heading">Parametrizaci&oacute;n de Cliente</div>
     <div class="panel-body">
@@ -22,7 +21,7 @@
                 </th>
 
                 <th>
-                    <input class="form-control" ng-model="q"  placeholder="Buscar"/>
+                    <input class="form-control" ng-model="q" placeholder="Buscar" />
                 </th>
             </tr>
             <tr dir-paginate="row in lista|filter: q|itemsPerPage:10">
@@ -32,7 +31,7 @@
 
                 <td>{{row.telefono}}</td>
 
-                <td class="row">{{row.ciudad.nombre}}</td>     
+                <td class="row">{{row.ciudad.name}}</td>
 
                 <td class="row">
                     <button type="button" class="btn btn-default" ng-click="editar(row)">
@@ -55,46 +54,31 @@
 
         <div class="form-group col-md-6" ng-class="errores.nombre ? 'error' : ''">
             <label for="nombre">nombre</label>
-            <input id="nombre" 
-                   class="form-control" 
-                   type="text"
-                   ng-model="datosFormulario.nombre"
-                   placeholder="nombre"/>
+            <input id="nombre" class="form-control" type="text" ng-model="datosFormulario.nombre" placeholder="nombre" />
             <div ng-show="errores.nombre">{{errores.nombre}}</div>
-        </div>				
+        </div>
         <div class="form-group col-md-6" ng-class="errores.direccion ? 'error' : ''">
             <label for="direccion">direccion</label>
-            <input id="direccion" 
-                   class="form-control" 
-                   type="text"
-                   ng-model="datosFormulario.direccion"
-                   placeholder="direccion"/>
+            <input id="direccion" class="form-control" type="text" ng-model="datosFormulario.direccion" placeholder="direccion" />
             <div ng-show="errores.direccion">{{errores.direccion}}</div>
-        </div>				
+        </div>
         <div class="form-group col-md-6" ng-class="errores.telefono ? 'error' : ''">
             <label for="telefono">telefono</label>
-            <input id="telefono" 
-                   class="form-control" 
-                   type="text"
-                   ng-model="datosFormulario.telefono"
-                   placeholder="telefono"/>
+            <input id="telefono" class="form-control" type="text" ng-model="datosFormulario.telefono" placeholder="telefono" />
             <div ng-show="errores.telefono">{{errores.telefono}}</div>
-        </div> 
+        </div>
+        -
         <div class="row">
             <div class="form-group col-md-6" ng-class="errores.ciudad ? 'error' : ''">
                 <label>ciudad</label>
-                <select id="ciudad" class="form-control" 
-                        ng-model="datosFormulario.ciudad"
-                        ng-options="option.nombre for option in listaCiudad track by option.id">
+                <select id="ciudad" class="form-control" ng-model="datosFormulario.ciudad" ng-options="option.name for option in listaciudad track by option.id">
                 </select>
                 <div ng-show="errores.ciudad">{{errores.ciudad}}</div>
             </div>
         </div>
-
         <div class="btn-group">
-            <button type="button" class="btn btn-default" ng-click="guardar()">Aceptar</button>
+            <button type="button" class="btn btn-default" ng-click="createOrsave()">Aceptar</button>
             <button type="button" class="btn btn-default" ng-click="cancelar()">Cancelar</button>
-        </div>    
+        </div>
     </div>
 </div>
-

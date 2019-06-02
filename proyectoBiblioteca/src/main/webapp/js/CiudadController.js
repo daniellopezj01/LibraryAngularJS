@@ -1,10 +1,10 @@
 'use strict';
 
-var consecutivoCiudad = 2;
-
 module.controller('CiudadCtrl', ['$scope', '$filter', '$http', function($scope, $filter, $http) {
     //listar
     $scope.lista;
+    $scope.falg = false;
+
     $scope.datosFormulario = {};
     $scope.panelEditar = false;
 
@@ -13,7 +13,6 @@ module.controller('CiudadCtrl', ['$scope', '$filter', '$http', function($scope, 
         then(function(response) {
             // $scope.lista = JSON.stringify(response.data);
             $scope.lista = response.data;
-            console.log($scope.lista[$scope.lista.length - 1].id);
         });
     }
 
@@ -23,7 +22,17 @@ module.controller('CiudadCtrl', ['$scope', '$filter', '$http', function($scope, 
     $scope.nuevo = function() {
         $scope.panelEditar = true;
         $scope.datosFormulario = {};
+        $scope.falg = false;
     };
+
+
+    $scope.createOrsave = function() {
+        if ($scope.falg == true) {
+            $scope.update();
+        } else {
+            $scope.guardar();
+        }
+    }
 
     $scope.guardar = function() {
         $scope.errores = {};
@@ -33,14 +42,12 @@ module.controller('CiudadCtrl', ['$scope', '$filter', '$http', function($scope, 
         if (!$scope.datosFormulario.id) {
             $scope.datosFormulario.id = $scope.lista[$scope.lista.length - 1].id + 1;
         }
-        //   $scope.lista.push($scope.datosFormulario);
         var config = {
             headers: {
                 'Content-Type': 'application/json'
             }
         }
         console.log($scope.datosFormulario);
-
         $http.post("http://localhost:8080/library/webresources/Ciudad", $scope.datosFormulario, config)
             .success(function(data, status, headers, config) {
                 $scope.PostDataResponse = data;
@@ -52,11 +59,31 @@ module.controller('CiudadCtrl', ['$scope', '$filter', '$http', function($scope, 
                     "<hr />headers: " + header +
                     "<hr />config: " + config;
             });
-
-
         alert("Sus datos han sido guardados con éxito");
         $scope.cancelar();
     };
+
+    $scope.update = function() {
+        var config = {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }
+        console.log($scope.datosFormulario);
+        $http.put("http://localhost:8080/library/webresources/Ciudad", $scope.datosFormulario, config)
+            .success(function(data, status, headers, config) {
+                $scope.PostDataResponse = data;
+                $scope.listar();
+            })
+            .error(function(data, status, header, config) {
+                $scope.ResponseDetails = "Data: " + data +
+                    "<hr />status: " + status +
+                    "<hr />headers: " + header +
+                    "<hr />config: " + config;
+            });
+        alert("datos actualizados correctamente");
+        $scope.cancelar();
+    }
 
     $scope.cancelar = function() {
         $scope.panelEditar = false;
@@ -67,7 +94,9 @@ module.controller('CiudadCtrl', ['$scope', '$filter', '$http', function($scope, 
     $scope.editar = function(data) {
         $scope.panelEditar = true;
         $scope.datosFormulario = data;
+        $scope.falg = true;
     };
+
     //eliminar
     $scope.eliminar = function(data) {
         if (confirm('\xbfDesea elminar este registro?')) {
